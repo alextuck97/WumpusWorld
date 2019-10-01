@@ -25,8 +25,8 @@ struct BoardSquare{
 
 };
 
-bool operator==(const BoardSquare *lhs, const BoardSquare *rhs) {
-	return lhs->location == rhs->location;
+bool operator==(const BoardSquare &lhs, const BoardSquare &rhs) {
+	return lhs.location == rhs.location;
 }
 
 class WorldGraph {
@@ -43,9 +43,9 @@ public:
 
 	void deleteBoardSquares(BoardSquare * initialSquare);
 
-	std::vector<*BoardSquare> exploredSet;
+	std::vector<BoardSquare*> exploredSet;
 
-	std::vector<*BoardSquare>::iterator inExploredSet(BoardSquare *test);
+	std::vector<BoardSquare*>::iterator inExploredSet(BoardSquare *test);
 };
 
 
