@@ -38,9 +38,29 @@ void Agent::Initialize ()
 Action Agent::Process (Percept& percept)
 {
 	Action action;
+
+	//process percepts
+	if(percept.Bump)
+	{
+		state.worldSize = (state.agentLocation.X > state.agentLocation.Y ? state.agentLocation.X : state.agentLocation.Y);
+	}
+	//Add a stench iff agentlocation not in stench vector
+	handleStench(percept.Stench);
 	
+	state.wumpusLocation = locateWumpus(state.wumpusLocation);
 
+	action = handleGlitter(percept.Glitter);
 
+	if(state.hasGold && action != GRAB)
+	{
+		action = getToOrigin(state.wumpusLocation);
+	}
+	else
+	{
+		
+	}
+	
+	
 	state.previousAction = action;
 	return action;
 }
@@ -48,6 +68,70 @@ Action Agent::Process (Percept& percept)
 void Agent::GameOver (int score)
 {
 
+}
+
+
+void Agent::handleStench(bool stench){
+	if(stench)
+	{
+		std::vector<Location>::iterator it;
+		bool found = false;
+		for(it = state.stenches.begin(); it != state.stenches.end(); ++it){
+			if(*it == state.agentLocation)
+			{
+				found = true;
+				break;
+			}
+		}
+		if(!found)
+			state.stenches.push_back(state.agentLocation);
+	}
+	else
+	{
+		std::vector<Location>::iterator it;
+		bool found = false;
+		for(it = state.notStenches.begin(); it != state.notStenches.end(); ++it){
+			if(*it == state.agentLocation)
+			{
+				found = true;
+				break;
+			}
+		}
+		if(!found)
+			state.notStenches.push_back(state.agentLocation);
+	}
+}
+
+
+Action Agent::handleGlitter(bool glitter){
+	Action action;
+	if(glitter)
+	{
+		action = GRAB;
+		state.hasGold = true;
+		state.goldLocation = state.agentLocation;
+	}
+	return action;
+}
+
+Location Agent::locateWumpus(Location wumpusLocation){
+
+	
+	if(wumpusLocation == Location(-1,-1))
+	{
+		if(state.stenches.size() >= 3){
+			//Can locate
+		}
+		else if(state.stenches.size() >= 2){
+			//can try
+		}
+		else{//No chance
+			return wumpusLocation;
+		}
+	}
+	else{
+		return wumpusLocation;
+	} 
 }
 
 

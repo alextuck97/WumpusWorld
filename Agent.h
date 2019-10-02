@@ -17,6 +17,7 @@ struct State {
 		Location goldLocation;
 		Location wumpusLocation;
 		std::vector<Location> stenches;
+		std::vector<Location> notStenches;
 		int worldSize;
 
 		Action previousAction;
@@ -38,6 +39,13 @@ public:
 
 	//Agent maintains state information directly relating to itself.
 	State state;
+
+	Action getToOrigin(Location wumpusLocation);
+	void handleStench(bool stench);
+	Action handleGlitter(bool glitter);
+
+	//Attempt to locate the wumpus if it is not known
+	Location locateWumpus(Location wumpusLocation);
 
 	//Functions for saving and reading world information on agent death
 	//and resurrection
