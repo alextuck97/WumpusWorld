@@ -46,7 +46,7 @@ public:
 
 	//Attempt to locate the wumpus if it is not known
 	Location locateWumpus(Location wumpusLocation);
-
+	void testWumpusLocator();
 	//Functions for saving and reading world information on agent death
 	//and resurrection
 	void ReadWorldInformation(State &theState);
@@ -54,5 +54,10 @@ public:
 
 };
 
+//If a component of lhs - rhs is 0, they have the same x or y coord,
+//implying a stench exists between them
+Location operator+(Location &lhs, Location &rhs);
+
+Location operator-(Location &lhs, Location &rhs);
 
 #endif //AGENT_H
