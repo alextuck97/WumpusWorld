@@ -7,7 +7,8 @@
 #include "Percept.h"
 #include "Location.h"
 #include "Orientation.h"
-#include "WorldGraph.h"
+#include <fstream>
+//#include "WorldGraph.h"
 
 class Agent
 {
@@ -20,16 +21,22 @@ public:
 
 	//Agent maintains state information directly relating to itself.
 	struct State {
-		bool hasArrow;
-		bool wumpusAlive;
-		bool hasGold;
-		Orientation orientation;
-		Location location;
+	
+		Location goldLocation;
+		Location wumpusLocation;
+		std::vector<Location> stenches;
+		int worldSize = -1;
+
 		Action previousAction;
+		Orientation orientation;
+		Location agentLocation;
+		bool hasGold;
 	}state;
 
-	WorldGraph world;
+	void ReadWorldInformation(State &state);
+	void SaveWorldInformation(State state);
 
 };
 
-#endif // AGENT_H
+
+#endif //AGENT_H

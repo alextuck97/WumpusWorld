@@ -12,7 +12,7 @@ Agent::Agent ()
 
 Agent::~Agent ()
 {
-	
+	SaveWorldInformation(this->state);
 }
 
 
@@ -20,37 +20,22 @@ Agent::~Agent ()
 void Agent::Initialize ()
 {
 	state.hasGold = false;
-	state.hasArrow = true;
-	state.wumpusAlive = true;
+	
 	
 	state.agentLocation = Location(1, 1);
+	state.wumpusLocation = Location(-1,-1);
 	state.orientation = RIGHT;
 	
-	world.currentLocation = world.initialSquare;
+	
 
 }
 
 Action Agent::Process (Percept& percept)
 {
-	if (state.previousAction == GOFORWARD && !percept.Bump) {
-		world.newBoardSquare(state.orientation);
-	}
-	else if (percept.Bump) {
-		world.currentLocation->wall = state.orientation;
-	}
-		
-
 	Action action;
-	if (percept.Breeze) {
-		world.currentLocation->breeze = true;
-	}
-	if (percept.Stench) {
-		world.currentLocation->stench = true;
-	}
-	if (percept.Glitter) {
-		world.currentLocation->gold = true;
-	}
 	
+
+
 	state.previousAction = action;
 	return action;
 }
@@ -58,5 +43,37 @@ Action Agent::Process (Percept& percept)
 void Agent::GameOver (int score)
 {
 
+}
+
+
+void Agent::ReadWorldInformation(State &state)
+{
+	char * s = "WorldData.txt";
+	ifstream f;
+	f.open(s);
+	if(f.is_open())
+	{
+		Location l;
+	}
+	else
+	{
+		printf("Error opening %s\n", s);	
+	}
+}
+
+void Agent::SaveWorldInformation(State state)
+{
+	char * s = "WorldData.txt";
+	ofstream f;
+	f.open(s);
+	if(f.is_open())
+	{
+		f << "GOLDLOCATION " << state.goldLocation.X << " " << state.goldLocation.Y << std::endl;
+		f << "WUMPUSLOCATION " << state.wumpusLocation.X << " " << state.wumpusLocation.Y << std::endl;
+	}
+	else
+	{
+		printf("Error opening %s\n", s);	
+	}
 }
 
