@@ -8,7 +8,23 @@
 #include "Location.h"
 #include "Orientation.h"
 #include <fstream>
+#include <string>
 //#include "WorldGraph.h"
+
+
+struct State {
+	
+		Location goldLocation;
+		Location wumpusLocation;
+		std::vector<Location> stenches;
+		int worldSize;
+
+		Action previousAction;
+		Orientation orientation;
+		Location agentLocation;
+		bool hasGold;
+	
+};
 
 class Agent
 {
@@ -19,22 +35,14 @@ public:
 	Action Process (Percept& percept);
 	void GameOver (int score);
 
+
 	//Agent maintains state information directly relating to itself.
-	struct State {
-	
-		Location goldLocation;
-		Location wumpusLocation;
-		std::vector<Location> stenches;
-		int worldSize = -1;
+	State state;
 
-		Action previousAction;
-		Orientation orientation;
-		Location agentLocation;
-		bool hasGold;
-	}state;
-
-	void ReadWorldInformation(State &state);
-	void SaveWorldInformation(State state);
+	//Functions for saving and reading world information on agent death
+	//and resurrection
+	void ReadWorldInformation(State &theState);
+	void SaveWorldInformation(State theState);
 
 };
 
