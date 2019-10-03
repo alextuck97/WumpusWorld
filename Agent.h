@@ -9,6 +9,7 @@
 #include "Orientation.h"
 #include <fstream>
 #include <string>
+#include <queue>
 //#include "WorldGraph.h"
 
 
@@ -39,10 +40,13 @@ public:
 
 	//Agent maintains state information directly relating to itself.
 	State state;
-
+	std::queue<Action> actionQueue;
 	Action getToOrigin(Location wumpusLocation);
 	void handleStench(bool stench);
 	Action handleGlitter(bool glitter);
+
+	Action getGoldAndGetOut(Percept &percept);
+	Action searchForGold(Percept &percept);
 
 	//Attempt to locate the wumpus if it is not known
 	Location locateWumpus(Location wumpusLocation);
@@ -52,6 +56,12 @@ public:
 	void ReadWorldInformation(State &theState);
 	void SaveWorldInformation(State theState);
 
+	void orientateLeft(Orientation o);
+	void orientateRight(Orientation o);
+	void orientateUp(Orientation o);
+	void orientateDown(Orientation o);
+
+	void updateAgentLocation(Orientation o);
 };
 
 //If a component of lhs - rhs is 0, they have the same x or y coord,
