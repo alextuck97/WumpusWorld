@@ -13,13 +13,15 @@ Location operator+(Location lhs, Location rhs)
 	return Location(X, Y);
 }
 
-//If a component of lhs - rhs is 0, they have the same x or y coord,
-//implying a stench exists between them
-Location operator-(Location &lhs, Location &rhs)
+int * binary(int n)
 {
-	int X = lhs.X - rhs.X;
-	int Y = lhs.Y - rhs.Y;
-	return Location(X, Y);
+	int b = ceil(log2((float)n));
+	int * binary_rep = new int[b];
+	int t = 0;
+	for(int i = 1 << 31; i > 0; i = i /2)
+		binary_rep[t] = n & i;
+
+	return binary_rep;
 }
 
 Agent::Agent()
@@ -47,17 +49,14 @@ Action Agent::Process(Percept &percept)
 		updateAgentLocation(state.orientation);
 	}
 
-	if (!actionQueue.empty())
-	{
-		action = actionQueue.front();
-		actionQueue.pop();
-	}
-	else
+	if (actionQueue.empty())
 	{
 		updateState(percept);
-		action = selectAction(percept);
+		selectAction(percept);
 	}
 	
+	action = actionQueue.front();
+	actionQueue.pop();
 	return action;
 }
 
@@ -69,11 +68,51 @@ void Agent::GameOver(int score)
 }
 
 
-Action selectAction(Percept &percept)
+void Agent::selectAction(Percept &percept)
 {
-	
+	if(percept.Glitter)
+	{
+		actionQueue.push(GRAB);
+		state.hasGold = true;
+		return;
+	}
+	//How to guide the search? 
 }
 
+void Agent::computePitProbability()
+{
+	for(auto f = state.frontier.begin(); f != state.frontier.end(); f++)
+	{
+		float p_pit_true = 0.f;
+		float p_pit_false = 0.f;
+		std::vector<Location> frontier_prime = state.frontier;
+		auto f_prime = std::find(frontier_prime.begin(), frontier_prime.end(), *f);
+		frontier_prime.erase(f_prime);
+
+		for(int i = 0; i < powf(2.f, frontier_prime.size()); i++)
+		{
+			
+			float num_true;
+			float num_false;
+			float p_frontier_prime = powf(0.2f,num_true)*pow(0.8f,num_false);
+
+			if(breezeIsConsistentWithTrue(state.breeze, ))
+			{
+				p_pit_true += p_frontier_prime;
+			}
+
+			if(breezeIsConsistentWithFalse(state.breeze,))
+			{
+				p_pit_false += p_frontier_prime;
+			}
+		}
+
+		p_pit_true *= 0.2f;
+		p_pit_false *= 0.8f;
+		p_pit_true = p_pit_true / (p_pit_true + p_pit_false);
+		pit_probabilities[f->X][f->Y] = p_pit_true;
+	}
+}
 
 void Agent::updateState(Percept &percept)
 {

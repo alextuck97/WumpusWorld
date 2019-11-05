@@ -12,6 +12,7 @@
 #include <queue>
 #include <algorithm>
 #include <map>
+#include <math.h>
 
 #define WORLD_SIZE 5
 
@@ -46,9 +47,11 @@ public:
 
 	State state;
 	
+	int pit_probabilities[WORLD_SIZE][WORLD_SIZE];
+
 	std::queue<Action> actionQueue;
 	
-	Action selectAction(Percept &percept);
+	void selectAction(Percept &percept);
 
 	void computePitProbability(); 
 
@@ -69,6 +72,6 @@ Location operator+(Location lhs, Location rhs);
 
 Location operator-(Location &lhs, Location &rhs);
 
-
+int * binary(int n);
 
 #endif //AGENT_H
