@@ -6,7 +6,7 @@ OBJECTS = Action.o Agent.o Location.o Orientation.o Percept.o WumpusWorld.o
 PYTHON-DEF = -DPYTHON
 PYTHON-OBJ = Action.o PyAgent.o Location.o Orientation.o Percept.o WumpusWorld.o
 
-PYTHON_CONFIG = python-config
+PYTHON_CONFIG = python3-config
 PYTHON-INC = $(shell $(PYTHON_CONFIG) --includes)
 PYTHON-LIB = $(shell $(PYTHON_CONFIG) --ldflags)
 

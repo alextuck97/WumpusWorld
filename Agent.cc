@@ -96,12 +96,12 @@ void Agent::computePitProbability()
 			float num_false;
 			float p_frontier_prime = powf(0.2f,num_true)*pow(0.8f,num_false);
 
-			if(breezeIsConsistentWithTrue(state.breeze, ))
+			if(true)//breezeIsConsistentWithTrue(state.breeze, ))
 			{
 				p_pit_true += p_frontier_prime;
 			}
 
-			if(breezeIsConsistentWithFalse(state.breeze,))
+			if(false)//breezeIsConsistentWithFalse(state.breeze,))
 			{
 				p_pit_false += p_frontier_prime;
 			}
@@ -157,25 +157,22 @@ void Agent::updateState(Percept &percept)
 		{
 			state.frontier.push_back(*it);
 		} 
-
-		
 	}
-	
 }
 
 //Return a vector of valid locations adjacent to l
 std::vector<Location> Agent::getAdjacentLocations(Location l)
 {
 	std::vector<Location> adj;
-	Location left = l + Location(-1,0);
-	Location up = l + Location(0,1);
-	Location right = l + Location(1,0);
-	Location down = l + Location(0,-1);
+	adj.push_back(l + Location(-1,0));
+	adj.push_back(l + Location(0,1));
+	adj.push_back(l + Location(1,0));
+	adj.push_back(l + Location(0,-1));
 
 	for(auto it = adj.begin(); it != adj.end(); it++)
 	{
-		if(it->X >= 0 && it->Y >= 0 && it->X < WORLD_SIZE && it->Y < WORLD_SIZE)//Add something about world size
-			adj.push_back(*it);
+		if(it->X < 0 && it->Y < 0 && it->X >= WORLD_SIZE && it->Y >= WORLD_SIZE)
+			adj.erase(*it);
 	}
 
 	return adj;
