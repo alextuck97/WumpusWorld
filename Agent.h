@@ -10,21 +10,28 @@
 #include <fstream>
 #include <string>
 #include <queue>
-//#include "WorldGraph.h"
+#include <algorithm>
+#include <map>
 
+#define WORLD_SIZE 5
 
 struct State {
 	
-		Location goldLocation;
-		Location wumpusLocation;
-		std::vector<Location> stenches;
-		std::vector<Location> notStenches;
-		int worldSize;
+	Location goldLocation;
+	Location wumpusLocation;
+	std::vector<Location> stenches;
 
-		Action previousAction;
-		Orientation orientation;
-		Location agentLocation;
-		bool hasGold;
+	std::vector<Location> frontier;
+	std::vector<Location> breeze;
+	std::vector<Location> known_pits;
+	std::vector<Location> known_not_pits;
+
+	int worldSize;
+
+	Action previousAction;
+	Orientation orientation;
+	Location agentLocation;
+	bool hasGold;
 	
 };
 
@@ -37,37 +44,31 @@ public:
 	Action Process (Percept& percept);
 	void GameOver (int score);
 
-
-	//Agent maintains state information directly relating to itself.
 	State state;
+	
 	std::queue<Action> actionQueue;
-	Action getToOrigin(Location wumpusLocation);
-	void handleStench(bool stench);
-	Action handleGlitter(bool glitter);
+	
+	Action selectAction(Percept &percept);
 
-	Action getGoldAndGetOut(Percept &percept);
-	Action searchForGold(Percept &percept);
+	void computePitProbability(); 
 
-	//Attempt to locate the wumpus if it is not known
-	Location locateWumpus(Location wumpusLocation);
-	void testWumpusLocator();
-	//Functions for saving and reading world information on agent death
-	//and resurrection
-	void ReadWorldInformation(State &theState);
-	void SaveWorldInformation(State theState);
+	void updateState(Percept &percept);
 
-	void orientateLeft(Orientation o);
-	void orientateRight(Orientation o);
-	void orientateUp(Orientation o);
-	void orientateDown(Orientation o);
+	std::vector<Location> getAdjacentLocations(Location l);
+	void goLeft(Orientation o);
+	void goRight(Orientation o);
+	void goUp(Orientation o);
+	void goDown(Orientation o);
 
 	void updateAgentLocation(Orientation o);
 };
 
 //If a component of lhs - rhs is 0, they have the same x or y coord,
 //implying a stench exists between them
-Location operator+(Location &lhs, Location &rhs);
+Location operator+(Location lhs, Location rhs);
 
 Location operator-(Location &lhs, Location &rhs);
+
+
 
 #endif //AGENT_H
