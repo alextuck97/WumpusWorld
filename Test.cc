@@ -11,7 +11,7 @@ bool TestGetAdjacentLocations(Agent &a, Location l)
     expected.push_back(Location(l.X + 1, l.Y));
     for(auto it = adj.begin(); it != adj.end(); it++)
     {
-        
+        auto found = std::find(expected.begin(), expected.end(), *it);
     }
 }
 
