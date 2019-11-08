@@ -1,5 +1,5 @@
 # PyAgent.py
-
+import random 
 import Action as A
 import Orientation as O
 from queue import Queue
@@ -11,11 +11,23 @@ RIGHT = 1
 UP = 2
 DOWN = 3
 
+
+class GraphNode:
+    def __init__(self, value, parent):
+        self.value = value
+        self.parent = parent
+        self.child = []
+
+    def add_child(self, child):
+        self.child.append(child)
+
 class Agent:
    
     def __init__(self):
         self.action_queue = Queue()
         self.has_gold = False
+        self.gold_location = (-1,-1)
+        self.target_location = (-1,-1)
         self.known = {0:[],1:[]}#List of not pits (0) and pits (1)
         self.breezes = []
         self.frontier = []
@@ -85,10 +97,7 @@ class Agent:
         if location in self.frontier:
             self.frontier.remove(location)
 
-        adjacent_to_me = [(location[0], location[1] - 1 ),
-                            (location[0],location[1] + 1),
-                            (location[0] - 1, location[1]),
-                            (location[0] + 1, location[1])]
+        adjacent_to_me = self.get_adjacent(location)
         
         for l in adjacent_to_me:
             #Check if the adjacent square is in bounds
@@ -197,20 +206,98 @@ class Agent:
         
         return True
 
-
+    def get_adjacent(self, location):
+        return [(location[0], location[1] - 1 ),
+                    (location[0],location[1] + 1),
+                    (location[0] - 1, location[1]),
+                    (location[0] + 1, location[1])]
 
     def locate_wumpus(self):
         pass
 
     def pick_action(self, glitter):
+        '''
+        Considers the current state, and pushes actions
+        to the queue
+        '''
         if glitter:
             self.action_queue.put(A.GRAB)
         elif self.has_gold:
             #Get to the exit
             pass
+        elif self.gold_location != (-1,-1):
+            #Get to gold
+            pass
         else:
-            #Explore
-            actions = {}
+            self.target_location = self.get_new_target_to_explore()
+            self.get_to_target(self.target_location)
+
+
+    def get_new_target_to_explore(self):
+        '''
+        Find the frontier location with the least risk 
+        If multiple equally least risky frontier points, pick randomly
+        '''
+        min_risk = 1000000
+        candidate_locations = []
+        for f in self.frontier:
+            if self.pit_probabilities[f] == min_risk:
+                candidate_locations.append(f)
+            elif self.pit_probabilities[f] < min_risk:
+                min_risk = self.pit_probabilities[f]
+                candidate_locations.clear()
+                candidate_locations.append(f)
+
+        r = random.randint(0,len(candidate_locations)-1)
+        
+        return candidate_locations[r]
+
+
+
+    def get_to_target(self, target_location):
+        '''
+        Push actions to the queue to get the agent to the target
+        Assumes target is on frontier or known
+        '''
+        actions = {LEFT:self.go_left, RIGHT:self.go_right,
+            UP:self.go_up, DOWN:self.go_down}
+        directions = {(0,-1):DOWN,(0,1):UP,(1,0):RIGHT,(-1,0):LEFT}
+        location = (self.x_loc,self.y_loc)
+
+        #BFS
+        g = GraphNode(location,None)
+
+        frontier = Queue()
+        frontier.put(g)
+        explored = set()
+        found = False
+        while not frontier.empty() or found:
+            f = frontier.get()
+            explored.add(f.location)
+
+            adj = self.get_adjacent(f.value)
+
+            for a in adj:
+                #if a has not been explored and a is not a pit
+                if a not in explored and self.pit_probabilities[a] == 0:
+                    a_node = GraphNode(a,f)
+                    f.add_child(a_node)
+                    if a_node.value == target_location:
+                        f = a_node
+                        found = True
+                    else:
+                        frontier.put(a_node)
+        
+        move_list = []
+        while f.parent is not None:
+            #Create a list of moves the agent must execute
+            c = tuple(i1 - i2 for i1, i2 in zip(f.parent.value,f.value))
+            move_list.append(directions[c])
+        
+        move_list.reverse()
+        for m in move_list:
+            m()
+
 
     def update_location(self):
         if self.orientation == O.LEFT:
@@ -246,8 +333,9 @@ def PyAgent_Process (stench,breeze,glitter,bump,scream):
 
     if a.action_queue.empty():
         a.update_state(stench, breeze, glitter, bump, scream)
-    else:
-        action = a.action_queue.get()
+        a.pick_action(glitter)
+    
+    action = a.action_queue.get()
 
     return action
 
@@ -261,3 +349,4 @@ if __name__ == "__main__":
     breezes = [(1,2),(2,1)]
     expected = {(3,1):0.31,(2,2):0.86,(1,3):0.31}
     a.calculate_pits(frontier, breezes, [])
+    print(a.pit_probabilities)
